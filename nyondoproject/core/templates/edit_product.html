@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method="POST" action="{% url 'edit_product' product.id %}">
+    {% csrf_token %}
+ 
+     <div class="mb-3">
+        <label for="product_name"> Product Name</label>
+        <input type="text" name="name" value= {{name}}>
+    </div>
+    <div class="mb-3">
+        <label for="category">Category</label>
+        <input type="text" name="category" value={{category}}>
+    </div>
+
+    <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Cost Price</label>
+        <input type="number" name="unit_cost" value={{unit_cost}} class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+        
+    </div>
+    <div class="mb-3">
+        <label for="exampleInputPassword1" class="form-label">Selling Price</label>
+        <input type="number" name="selling_price" value={{selling_price}} class="form-control" id="exampleInputPassword1">
+    </div>
+    <div class="mb-3">
+        <label for="exampleInputPassword1" class="form-label">Quantity</label>
+        <input type="number" name="stock_quantity" value={{stock_quantity}}  class="form-control" id="exampleInputPassword1">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+
+{% endblock %}

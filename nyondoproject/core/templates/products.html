@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>Products</h3>
+<a href="/add_product/">Add Product</a>
+
+
+<table class="table">
+    <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Cost</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Action</th>
+    </tr>
+
+    {% for product in products %}
+    <tr>
+        <td>{{ product.name }}</td>
+        <td>{{ product.category }}</td>
+        <td>{{ product.unit_cost }}</td>
+        <td>{{ product.selling_price }}</td>
+        <td>{{ product.stock_quantity }}</td>
+         <td>
+    <a href="{% url 'edit_product' product.id %}">Edit</a> 
+    <button class="btn btn-danger btn-sm"
+        data-bs-toggle="modal"
+        data-bs-target="#deleteModal"
+        data-url="{% url 'delete_product' product.id %}"
+        onclick="setDeleteUrl(this)">
+    Delete
+</button>
+</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% include 'delete_modal.html' %}
+
+<script>
+function setDeleteUrl(btn) {
+    let url = btn.getAttribute("data-url");
+    document.getElementById("deleteBtn").href = url;
+}
+</script>
+{% endblock %}

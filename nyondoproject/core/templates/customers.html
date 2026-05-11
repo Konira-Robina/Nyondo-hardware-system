@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3>Customers</h3>
+<a href="/add-customer/" class="btn btn-primary mb-2">Add Customer</a>
+
+<table class="table">
+    <tr>
+        <th>Name</th>
+        <th>NIN</th>
+        <th>Phone</th>
+    </tr>
+
+    {% for c in customers %}
+    <tr>
+        <td>{{ c.full_name }}</td>
+        <td>{{ c.nin }}</td>
+        <td>{{ c.phone }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
+
