@@ -2,7 +2,7 @@
 
 {% block content %}
 <h3>Products</h3>
-<a href="/add_product/">Add Product</a>
+<a href="/add_product/" class="btn btn-success">Add Product</a>
 
 
 <table class="table">
@@ -22,26 +22,14 @@
         <td>{{ product.unit_cost }}</td>
         <td>{{ product.selling_price }}</td>
         <td>{{ product.stock_quantity }}</td>
-         <td>
-    <a href="{% url 'edit_product' product.id %}">Edit</a> 
-    <button class="btn btn-danger btn-sm"
-        data-bs-toggle="modal"
-        data-bs-target="#deleteModal"
-        data-url="{% url 'delete_product' product.id %}"
-        onclick="setDeleteUrl(this)">
-    Delete
-</button>
-</td>
+        <td>
+            <a href="{% url 'edit_product' product.id %}"class="btn btn-success">Edit</a>
+            <!-- <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                data-url="{% url 'delete_product' product.id %}" onclick="setDeleteUrl(this)">Delete</button> -->
+       <a href="{% url 'delete_product' product.id %}" class="btn btn-danger">Delete</a>
+            </td>
     </tr>
     {% endfor %}
 </table>
 
-{% include 'delete_modal.html' %}
-
-<script>
-function setDeleteUrl(btn) {
-    let url = btn.getAttribute("data-url");
-    document.getElementById("deleteBtn").href = url;
-}
-</script>
 {% endblock %}
