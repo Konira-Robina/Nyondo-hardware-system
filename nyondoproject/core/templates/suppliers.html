@@ -1,0 +1,73 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between mb-3">
+        <h2>Suppliers</h2>
+
+        <a href="{% url 'add_supplier' %}" class="btn btn-primary">
+            Add Supplier
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Supplier</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Cost Price</th>
+                        <th>Amount Paid</th>
+                        <th>Payment Method</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for supplier in suppliers %}
+
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+
+                        <td>{{ supplier.date }}</td>
+
+                        <td>{{ supplier.supplier_name }}</td>
+
+                        <td>{{ supplier.product }}</td>
+
+                        <td>{{ supplier.quantity }}</td>
+
+                        <td>{{ supplier.cost_price }}</td>
+
+                        <td>{{ supplier.amount_paid }}</td>
+
+                        <td>{{ supplier.method_of_payment }}</td>
+                        <td>
+                            <a href="{% url 'edit_supplier' supplier.id %}" class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
+
+                            <a href="{% url 'delete_supplier' supplier.id %}" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Delete this supplier?');">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="8" class="text-center">No suppliers found</td>
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

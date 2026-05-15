@@ -1,24 +1,68 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
-<h3>Customers</h3>
-<a href="/add-customer/" class="btn btn-primary mb-2">Add Customer</a>
+<div class="container mt-5">
+  <div class="d-flex justify-content-between mb-3">
+    <h3>Customers</h3>
 
-<table class="table">
-    <tr>
-        <th>Name</th>
-        <th>NIN</th>
-        <th>Phone</th>
-    </tr>
+    <a href="{% url 'add_customer' %}" class="btn btn-primary">
+      Add Customer
+    </a>
+  </div>
 
-    {% for c in customers %}
-    <tr>
-        <td>{{ c.full_name }}</td>
-        <td>{{ c.nin }}</td>
-        <td>{{ c.phone }}</td>
-    </tr>
-    {% endfor %}
-</table>
+  <div class="card shadow">
+    <div class="card-body table-responsive">
+      <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Full Name</th>
+            <th>NIN</th>
+            <th>Phone</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for c in customers %}
+
+          <tr>
+            <td>{{ forloop.counter }}</td>
+
+            <td>{{ c.full_name }}</td>
+
+            <td>{{ c.nin }}</td>
+
+            <td>{{ c.phone }}</td>
+
+            <td>
+              <a
+                href="{% url 'edit_customer' c.id %}"
+                class="btn btn-warning btn-sm"
+              >
+                Edit
+              </a>
+
+              <a
+                href="{% url 'delete_customer' c.id %}"
+                class="btn btn-danger btn-sm"
+                onclick="return confirm('Delete this customer?');"
+              >
+                Delete
+              </a>
+            </td>
+          </tr>
+
+          {% empty %}
+
+          <tr>
+            <td colspan="5" class="text-center">No customers found</td>
+          </tr>
+
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
-

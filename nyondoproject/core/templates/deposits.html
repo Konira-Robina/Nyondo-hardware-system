@@ -1,0 +1,117 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container mt-5">
+  <!-- HEADER -->
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Customer Deposits</h2>
+
+    <a href="{% url 'add_deposit' %}" class="btn btn-primary">
+      + Add Deposit
+    </a>
+  </div>
+
+  <!-- CARD -->
+
+  <div class="card shadow border-0 rounded-4">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <!-- TABLE HEADER -->
+
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Amount</th>
+              <th>Balance</th>
+              <th>Status</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <!-- TABLE BODY -->
+
+          <tbody>
+            {% for deposit in deposits %}
+
+            <tr>
+              <!-- NUMBER -->
+
+              <td>{{ forloop.counter }}</td>
+
+              <!-- DATE -->
+
+              <td>{{ deposit.date }}</td>
+
+              <!-- CUSTOMER -->
+
+              <td>{{ deposit.customer.full_name }}</td>
+
+              <!-- AMOUNT -->
+
+              <td>UGX {{ deposit.amount }}</td>
+
+              <!-- BALANCE -->
+
+              <td>UGX {{ deposit.balance }}</td>
+
+              <!-- STATUS -->
+
+              <td>
+                {% if deposit.payment_status == 'Completed' %}
+
+                <span class="badge bg-success"> Completed </span>
+
+                {% else %}
+
+                <span class="badge bg-warning text-dark"> Pending </span>
+
+                {% endif %}
+              </td>
+
+              <!-- DESCRIPTION -->
+
+              <td>{{ deposit.description }}</td>
+
+              <!-- ACTIONS -->
+
+              <td>
+                <a
+                  href="{% url 'edit_deposit' deposit.id %}"
+                  class="btn btn-warning btn-sm"
+                >
+                  Edit
+                </a>
+
+                <a
+                  href="{% url 'delete_deposit' deposit.id %}"
+                  class="btn btn-danger btn-sm"
+                  onclick="return confirm('Delete this deposit?');"
+                >
+                  Delete
+                </a>
+              </td>
+            </tr>
+
+            {% empty %}
+
+            <!-- EMPTY STATE -->
+
+            <tr>
+              <td colspan="8" class="text-center text-muted py-4">
+                No deposits found
+              </td>
+            </tr>
+
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -2,17 +2,13 @@
 
 <div class="container mt-5">
     <div class="card shadow-lg border-0 rounded-4">
-        <!-- HEADER -->
-
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-warning">
             <div class="d-flex justify-content-between">
-                <h3>Add Supplier</h3>
+                <h3>Edit Supplier</h3>
 
-                <a href="{% url 'suppliers' %}" class="btn btn-light"> Back </a>
+                <a href="{% url 'suppliers' %}" class="btn btn-dark"> Back </a>
             </div>
         </div>
-
-        <!-- BODY -->
 
         <div class="card-body">
             <form method="POST">
@@ -21,17 +17,22 @@
                 <!-- PRODUCT -->
 
                 <div class="mb-3">
-                    <label class="form-label"> Product </label>
+                    <select name="product"
+        class="form-select"
+        required>
 
-                    <select name="product" class="form-select" required>
-                        <option value="">Select Product</option>
+    {% for product in products %}
 
-                        {% for product in products %}
+    <option value="{{ product.id }}"
+        {% if supplier.product.id == product.id %}selected{% endif %}>
 
-                        <option value="{{ product.id }}">{{ product.name }}</option>
+        {{ product.name }}
 
-                        {% endfor %}
-                    </select>
+    </option>
+
+    {% endfor %}
+
+</select>
                 </div>
 
                 <!-- SUPPLIER NAME -->
@@ -39,7 +40,8 @@
                 <div class="mb-3">
                     <label class="form-label"> Supplier Name </label>
 
-                    <input type="text" name="supplier_name" class="form-control" required />
+                    <input type="text" name="supplier_name" value="{{ supplier.supplier_name }}" class="form-control"
+                        required />
                 </div>
 
                 <!-- QUANTITY -->
@@ -47,7 +49,8 @@
                 <div class="mb-3">
                     <label class="form-label"> Quantity </label>
 
-                    <input type="number" name="quantity" class="form-control" required />
+                    <input type="number" name="quantity" value="{{ supplier.quantity }}" class="form-control"
+                        required />
                 </div>
 
                 <!-- COST PRICE -->
@@ -55,7 +58,8 @@
                 <div class="mb-3">
                     <label class="form-label"> Cost Price </label>
 
-                    <input type="number" step="0.01" name="cost_price" class="form-control" required />
+                    <input type="number" step="0.01" name="cost_price" value="{{ supplier.cost_price }}"
+                        class="form-control" required />
                 </div>
 
                 <!-- DATE -->
@@ -63,10 +67,11 @@
                 <div class="mb-3">
                     <label class="form-label"> Date </label>
 
-                    <input type="date" name="date" class="form-control" required />
+                    <input type="date" name="date" value="{{ supplier.date|date:'Y-m-d' }}" class="form-control"
+                        required />
                 </div>
 
-                <!-- PAYMENT METHOD -->
+                <!-- PAYMENT -->
 
                 <div class="mb-3">
                     <label class="form-label"> Method Of Payment </label>
@@ -85,13 +90,12 @@
                 <div class="mb-3">
                     <label class="form-label"> Amount Paid </label>
 
-                    <input type="number" step="0.01" name="amount_paid" class="form-control" required />
+                    <input type="number" step="0.01" name="amount_paid" value="{{ supplier.amount_paid }}"
+                        class="form-control" required />
                 </div>
 
-                <!-- BUTTON -->
-
-                <button type="submit" class="btn btn-primary w-100">
-                    Save Supplier
+                <button type="submit" class="btn btn-warning w-100">
+                    Update Supplier
                 </button>
             </form>
         </div>

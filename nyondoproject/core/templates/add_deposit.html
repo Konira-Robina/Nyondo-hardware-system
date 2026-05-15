@@ -1,0 +1,109 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow border-0 rounded-4">
+        <!-- HEADER -->
+
+        <div class="card-header bg-primary text-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Add Customer Deposit</h3>
+            <a href="{% url 'deposits' %}" class="btn btn-light btn-sm">
+              Back
+            </a>
+          </div>
+        </div>
+
+        <!-- BODY -->
+
+        <div class="card-body p-4">
+          <form method="POST">
+            {% csrf_token %}
+
+            <!-- CUSTOMER -->
+
+            <div class="mb-3">
+              <label class="form-label fw-bold"> Customer </label>
+
+              <select name="customer" class="form-select" required>
+                <option value="">Select Customer</option>
+
+                {% for customer in customers %}
+
+                <option value="{{ customer.id }}">
+                  {{ customer.full_name }}
+                </option>
+
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- AMOUNT -->
+
+            <div class="mb-3">
+              <label class="form-label fw-bold"> Deposit Amount </label>
+
+              <input
+                type="number"
+                step="0.01"
+                name="amount"
+                class="form-control"
+                placeholder="Enter deposit amount"
+                required
+              />
+            </div>
+
+            <!-- BALANCE -->
+
+            <div class="mb-3">
+              <label class="form-label fw-bold"> Remaining Balance </label>
+
+              <input
+                type="number"
+                step="0.01"
+                name="balance"
+                class="form-control"
+                placeholder="Enter remaining balance"
+                required
+              />
+            </div>
+
+            <!-- STATUS -->
+
+            <div class="mb-3">
+              <label class="form-label fw-bold"> Payment Status </label>
+
+              <select name="payment_status" class="form-select">
+                <option value="Pending">Pending</option>
+
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+
+            <!-- DESCRIPTION -->
+
+            <div class="mb-4">
+              <label class="form-label fw-bold"> Description </label>
+
+              <textarea
+                name="description"
+                rows="4"
+                class="form-control"
+                placeholder="Optional notes about the deposit"
+              ></textarea>
+            </div>
+
+            <!-- BUTTON -->
+
+            <button type="submit" class="btn btn-primary w-100">
+              Save Deposit
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
