@@ -1,0 +1,27 @@
+{% extends 'base.html' %} {% block content %}
+
+<h3>Notifications</h3>
+
+<a href="/add_notification/" class="btn btn-primary mb-3"> Add Notification </a>
+
+<table class="table table-bordered">
+  <tr>
+    <th>Message</th>
+    <th>Status</th>
+    <th>Date</th>
+  </tr>
+
+  {% for notification in notifications %}
+
+  <tr>
+    <td>{{ notification.message }}</td>
+
+    <td>{% if notification.is_read %} Read {% else %} Unread {% endif %}</td>
+
+    <td>{{ notification.date }}</td>
+  </tr>
+
+  {% endfor %}
+</table>
+
+{% endblock %}

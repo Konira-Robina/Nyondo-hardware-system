@@ -1,0 +1,25 @@
+{% extends 'base.html' %} {% block content %}
+<h3>Invoices</h3>
+<a href="/add_invoice/" class="btn btn-primary mb-3"> Add Invoice </a>
+
+<table class="table table-bordered">
+  <tr>
+    <th>Invoice No</th>
+    <th>Customer</th>
+    <th>Total Amount</th>
+    <th>Date</th>
+  </tr>
+
+  {% for invoice in invoices %}
+
+  <tr>
+    <td>{{ invoice.invoice_number }}</td>
+    <td>{{ invoice.customer }}</td>
+    <td>{{ invoice.total_amount }}</td>
+    <td>{{ invoice.date }}</td>
+  </tr>
+
+  {% endfor %}
+</table>
+
+{% endblock %}

@@ -1,0 +1,523 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Nyondo General Hardware LTD | Management System
+    </title>
+
+    <!-- TAILWIND CSS -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FONT AWESOME -->
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</head>
+
+<body class="bg-gray-50 font-sans">
+
+    <!-- NAVBAR -->
+
+    <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-lg">
+
+        <div class="container mx-auto flex justify-between items-center">
+
+            <!-- LOGO -->
+
+            <h1 class="text-xl font-bold tracking-tight">
+
+                NYONDO
+                <span class="text-orange-500">
+
+                    HARDWARE
+
+                </span>
+
+            </h1>
+
+            <!-- NAV LINKS -->
+
+            <div class="space-x-6 hidden md:flex">
+
+                <a href="/products/"
+                    class="hover:text-orange-400 transition">
+
+                    Inventory
+
+                </a>
+
+                <a href="/credit_purchases/"
+                    class="hover:text-orange-400 transition">
+
+                    Credit Scheme
+
+                </a>
+
+                <a href="/sales/"
+                    class="hover:text-orange-400 transition">
+
+                    Sales Record
+
+                </a>
+
+                <a href="/customers/"
+                    class="hover:text-orange-400 transition">
+
+                    Customers
+
+                </a>
+
+            </div>
+
+            <!-- LOGIN BUTTON -->
+
+            <a href="/dashboard/"
+                class="bg-orange-600 hover:bg-orange-700 px-5 py-2 rounded-lg font-semibold transition">
+
+                Staff Login
+
+            </a>
+
+        </div>
+
+    </nav>
+
+    <!-- HERO SECTION -->
+
+    <header class="bg-slate-800 text-white py-24 px-4 text-center">
+
+        <h2 class="text-4xl md:text-6xl font-extrabold mb-6">
+
+            Construction Management Simplified
+
+        </h2>
+
+        <p class="text-lg text-gray-300 max-w-3xl mx-auto mb-10">
+
+            Manage wholesale and retail construction materials with ease.
+            Handle products, suppliers, sales, deposits, invoices,
+            customer credit, payments and stock movements in one
+            powerful system.
+
+        </p>
+
+        <div class="flex justify-center gap-4 flex-wrap">
+
+            <a href="/products/"
+                class="bg-white text-slate-900 px-6 py-3 rounded-md font-bold hover:bg-gray-100 transition">
+
+                Browse Stock
+
+            </a>
+
+            <a href="/customers/"
+                class="border border-white px-6 py-3 rounded-md font-bold hover:bg-white hover:text-slate-900 transition">
+
+                Salary Earner Scheme
+
+            </a>
+
+        </div>
+
+    </header>
+
+    <!-- FEATURES SECTION -->
+
+    <section class="container mx-auto py-16 px-4">
+
+        <div class="grid md:grid-cols-3 gap-8">
+
+            <!-- INVENTORY -->
+
+            <div class="bg-white p-8 rounded-xl shadow-md border-t-4 border-orange-500 hover:shadow-xl transition">
+
+                <div class="text-orange-500 text-4xl mb-4">
+
+                    <i class="fas fa-warehouse"></i>
+
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">
+
+                    Inventory Control
+
+                </h3>
+
+                <p class="text-gray-600 mb-4">
+
+                    Manage cement, iron bars, roofing sheets,
+                    nails and all construction materials with
+                    real-time stock tracking.
+
+                </p>
+
+                <ul class="text-sm text-gray-500 space-y-2">
+
+                    <li>✔ Predetermined pricing</li>
+
+                    <li>✔ Auto stock updates</li>
+
+                    <li>✔ Supplier management</li>
+
+                    <li>✔ Low stock alerts</li>
+
+                </ul>
+
+            </div>
+
+            <!-- CREDIT -->
+
+            <div class="bg-white p-8 rounded-xl shadow-md border-t-4 border-blue-500 hover:shadow-xl transition">
+
+                <div class="text-blue-500 text-4xl mb-4">
+
+                    <i class="fas fa-id-card"></i>
+
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">
+
+                    Credit Scheme
+
+                </h3>
+
+                <p class="text-gray-600 mb-4">
+
+                    Register salary earners and manage deposits,
+                    balances, payments and customer credit purchases.
+
+                </p>
+
+                <ul class="text-sm text-gray-500 space-y-2">
+
+                    <li>✔ Customer deposits</li>
+
+                    <li>✔ Balance tracking</li>
+
+                    <li>✔ Payment receipts</li>
+
+                    <li>✔ Credit monitoring</li>
+
+                </ul>
+
+            </div>
+
+            <!-- SALES -->
+
+            <div class="bg-white p-8 rounded-xl shadow-md border-t-4 border-green-500 hover:shadow-xl transition">
+
+                <div class="text-green-500 text-4xl mb-4">
+
+                    <i class="fas fa-truck"></i>
+
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">
+
+                    Sales & Delivery
+
+                </h3>
+
+                <p class="text-gray-600 mb-4">
+
+                    Record daily sales and calculate transport
+                    costs automatically for customer deliveries.
+
+                </p>
+
+                <div class="bg-green-50 p-4 rounded-lg text-sm text-green-800">
+
+                    <strong>
+
+                        Policy:
+
+                    </strong>
+
+                    Free delivery for orders above
+                    500,000 UGX within 10km.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- LIVE SYSTEM SECTION -->
+
+    <section class="bg-gray-100 py-20 px-4">
+
+        <div
+            class="container mx-auto max-w-6xl bg-white rounded-2xl shadow-xl overflow-hidden grid md:grid-cols-2">
+
+            <!-- LEFT -->
+
+            <div class="bg-slate-900 text-white p-10 flex flex-col justify-center">
+
+                <h3 class="text-3xl font-bold mb-4">
+
+                    Smart Hardware Management
+
+                </h3>
+
+                <p class="text-gray-300 mb-6">
+
+                    Track every stock movement, sale,
+                    supplier delivery, invoice and payment
+                    professionally.
+
+                </p>
+
+                <div class="space-y-3">
+
+                    <div>
+
+                        ✔ Product Management
+
+                    </div>
+
+                    <div>
+
+                        ✔ Supplier Tracking
+
+                    </div>
+
+                    <div>
+
+                        ✔ Invoice Generation
+
+                    </div>
+
+                    <div>
+
+                        ✔ Payment Receipts
+
+                    </div>
+
+                    <div>
+
+                        ✔ Dashboard Analytics
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+
+            <div class="p-10">
+
+                <h3 class="text-2xl font-bold mb-6">
+
+                    Quick Stock Entry
+
+                </h3>
+
+                <form class="grid grid-cols-2 gap-4">
+
+                    <div class="col-span-2">
+
+                        <label class="block text-sm font-medium text-gray-700">
+
+                            Item Name
+
+                        </label>
+
+                        <input type="text"
+                            placeholder="e.g. Iron Bars 12mm"
+                            class="w-full border p-3 rounded mt-1 outline-none focus:ring-2 focus:ring-orange-500">
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-medium text-gray-700">
+
+                            Unit Cost
+
+                        </label>
+
+                        <input type="number"
+                            class="w-full border p-3 rounded mt-1 outline-none">
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-medium text-gray-700">
+
+                            Selling Price
+
+                        </label>
+
+                        <input type="number"
+                            class="w-full border p-3 rounded mt-1 outline-none">
+
+                    </div>
+
+                    <div class="col-span-2">
+
+                        <button type="button"
+                            class="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-bold transition">
+
+                            Update Inventory
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- CTA SECTION -->
+
+    <section class="bg-orange-600 text-white py-16 text-center px-4">
+
+        <h2 class="text-4xl font-bold mb-4">
+
+            Ready To Manage Your Hardware Business Better?
+
+        </h2>
+
+        <p class="max-w-2xl mx-auto mb-8 text-orange-100">
+
+            Streamline inventory, sales, credit purchases,
+            suppliers and customer payments in one system.
+
+        </p>
+
+        <a href="/dashboard/"
+            class="bg-white text-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition">
+
+            Open Dashboard
+
+        </a>
+
+    </section>
+
+    <!-- FOOTER -->
+
+    <footer class="bg-slate-900 text-gray-400 py-10 border-t border-slate-800">
+
+        <div class="container mx-auto px-4">
+
+            <div class="grid md:grid-cols-3 gap-8">
+
+                <!-- COMPANY -->
+
+                <div>
+
+                    <h3 class="text-white text-xl font-bold mb-3">
+
+                        NYONDO HARDWARE
+
+                    </h3>
+
+                    <p class="text-sm">
+
+                        Nansana's trusted construction
+                        materials provider.
+
+                    </p>
+
+                </div>
+
+                <!-- LINKS -->
+
+                <div>
+
+                    <h4 class="text-white font-semibold mb-3">
+
+                        Quick Links
+
+                    </h4>
+
+                    <div class="space-y-2 text-sm">
+
+                        <a href="/products/" class="block hover:text-white">
+
+                            Products
+
+                        </a>
+
+                        <a href="/sales/" class="block hover:text-white">
+
+                            Sales
+
+                        </a>
+
+                        <a href="/customers/" class="block hover:text-white">
+
+                            Customers
+
+                        </a>
+
+                        <a href="/payments/" class="block hover:text-white">
+
+                            Payments
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+                <!-- CONTACT -->
+
+                <div>
+
+                    <h4 class="text-white font-semibold mb-3">
+
+                        Contact
+
+                    </h4>
+
+                    <p class="text-sm">
+
+                        Nansana, Uganda
+
+                    </p>
+
+                    <p class="text-sm">
+
+                        +256 700 000000
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <hr class="border-slate-700 my-6">
+
+            <div class="text-center text-sm">
+
+                © 2026 Nyondo General Hardware LTD.
+                All Rights Reserved.
+
+            </div>
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>

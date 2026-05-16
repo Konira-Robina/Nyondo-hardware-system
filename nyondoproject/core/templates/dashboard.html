@@ -1,15 +1,175 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
 
-{% block content %}
-<h3>Dashboard</h3>
+<h2 class="mb-4">Dashboard</h2>
+
+<!-- SUMMARY CARDS -->
 
 <div class="row">
-    <div class="col-md-4">
-        <div class="card p-3">Products: {{ products }}</div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6>Total Products</h6>
+
+                <h3>{{ total_products }}</h3>
+            </div>
+        </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card p-3">Sales: {{ sales }}</div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6>Total Sales</h6>
+
+                <h3>{{ total_sales }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6>Total Customers</h6>
+
+                <h3>{{ total_customers }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6>Total Suppliers</h6>
+
+                <h3>{{ total_suppliers }}</h3>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- SECOND ROW -->
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6>Total Revenue</h6>
+
+                <h3>UGX {{ total_revenue }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6>Total Deposits</h6>
+
+                <h3>UGX {{ total_deposit_amount }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6>Credit Balances</h6>
+
+                <h3>UGX {{ total_credit_balance }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- LOW STOCK -->
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h5 class="mb-3 text-danger">Low Stock Products</h5>
+
+        <table class="table">
+            <tr>
+                <th>Product</th>
+
+                <th>Stock Remaining</th>
+            </tr>
+
+            {% for product in low_stock_products %}
+
+            <tr>
+                <td>{{ product.name }}</td>
+
+                <td>{{ product.stock_quantity }}</td>
+            </tr>
+
+            {% empty %}
+
+            <tr>
+                <td colspan="2">No low stock products</td>
+            </tr>
+
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<!-- RECENT SALES -->
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h5 class="mb-3">Recent Sales</h5>
+
+        <table class="table">
+            <tr>
+                <th>Customer</th>
+
+                <th>Product</th>
+
+                <th>Amount</th>
+            </tr>
+
+            {% for sale in recent_sales %}
+
+            <tr>
+                <td>{{ sale.customer_name }}</td>
+
+                <td>{{ sale.product_name }}</td>
+
+                <td>{{ sale.total_amount }}</td>
+            </tr>
+
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<!-- RECENT SUPPLIERS -->
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <h5 class="mb-3">Recent Suppliers</h5>
+
+        <table class="table">
+            <tr>
+                <th>Supplier</th>
+
+                <th>Product</th>
+
+                <th>Quantity</th>
+            </tr>
+
+            {% for supplier in recent_suppliers %}
+
+            <tr>
+                <td>{{ supplier.supplier_name }}</td>
+
+                <td>{{ supplier.product }}</td>
+
+                <td>{{ supplier.quantity }}</td>
+            </tr>
+
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
 {% endblock %}

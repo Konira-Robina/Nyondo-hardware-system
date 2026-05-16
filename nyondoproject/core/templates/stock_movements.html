@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% block content %}
+
+<h3>Stock Movements</h3>
+
+<a href="/add_stock_movement/" class="btn btn-primary mb-3">
+    Add Stock Movement
+</a>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Product</th>
+        <th>Type</th>
+        <th>Quantity</th>
+        <th>Description</th>
+        <th>Date</th>
+    </tr>
+
+    {% for movement in movements %}
+
+    <tr>
+        <td>{{ movement.product }}</td>
+        <td>{{ movement.movement_type }}</td>
+        <td>{{ movement.quantity }}</td>
+        <td>{{ movement.description }}</td>
+        <td>{{ movement.date }}</td>
+    </tr>
+
+    {% endfor %}
+</table>
+
+{% endblock %}

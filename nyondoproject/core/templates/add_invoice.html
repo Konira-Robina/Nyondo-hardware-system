@@ -1,0 +1,84 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow border-0">
+        <!-- HEADER -->
+
+        <div class="card-header bg-dark text-white">
+          <h3 class="mb-0">Create Invoice</h3>
+        </div>
+
+        <!-- BODY -->
+
+        <div class="card-body">
+          <form method="POST">
+            {% csrf_token %}
+
+            <!-- CUSTOMER -->
+
+            <div class="mb-3">
+              <label class="form-label"> Customer </label>
+
+              <select name="customer" class="form-select" required>
+                <option value="">Select Customer</option>
+
+                {% for customer in customers %}
+
+                <option value="{{ customer.id }}">
+                  {{ customer.full_name }}
+                </option>
+
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- INVOICE NUMBER -->
+
+            <div class="mb-3">
+              <label class="form-label"> Invoice Number </label>
+
+              <input
+                type="text"
+                name="invoice_number"
+                class="form-control"
+                placeholder="e.g INV-2026-001"
+                required
+              />
+            </div>
+
+            <!-- TOTAL AMOUNT -->
+
+            <div class="mb-3">
+              <label class="form-label"> Total Amount </label>
+
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                name="total_amount"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <!-- BUTTONS -->
+
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'invoices' %}" class="btn btn-secondary">
+                Back
+              </a>
+
+              <button type="submit" class="btn btn-success">
+                Save Invoice
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

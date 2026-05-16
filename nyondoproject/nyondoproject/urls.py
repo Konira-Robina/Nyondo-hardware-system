@@ -20,7 +20,8 @@ from core import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.dashboard, name='dashboard'),
+    path('', views.index, name='index'),
+    path('dashboard/',views.dashboard,name='dashboard'),
     path('products/', views.products, name='products'),
     path('add_product/', views.add_product, name='add_product'),
     path('edit_product/<int:id>/',views.edit_product,name='edit_product'),
@@ -43,6 +44,15 @@ urlpatterns = [
     path('delete_deposit/<int:id>/',views.delete_deposit,name='delete_deposit'),
     path('credit_purchases/',views.credit_purchases,name='credit_purchases'),
     path('add_credit_purchase/',views.add_credit_purchase,name='add_credit_purchase'),
-]
+    path('stock_movements/', views.stock_movements, name='stock_movements'),
+    path('add_stock_movement/', views.add_stock_movement, name='add_stock_movement'),
+    path('invoices/', views.invoices, name='invoices'),
+    path('add_invoice/', views.add_invoice, name='add_invoice'),
+    path('payments/',views.payments,name='payments'),
+    path('add_payment/',views.add_payment,name='add_payment'),
+    path('payment_receipt/<int:id>/',views.payment_receipt,name='payment_receipt'),
+    path('notifications/', views.notifications, name='notifications'),
+    path('add_notification/', views.add_notification, name='add_notification'),
+    ]
 
 

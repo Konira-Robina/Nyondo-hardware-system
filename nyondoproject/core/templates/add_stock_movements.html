@@ -1,0 +1,45 @@
+{% extends 'base.html' %} {% block content %}
+
+<h3>Add Stock Movement</h3>
+
+<form method="POST">
+  {% csrf_token %}
+
+  <div class="mb-3">
+    <label>Product</label>
+
+    <select name="product" class="form-select">
+      {% for product in products %}
+
+      <option value="{{ product.id }}">{{ product.name }}</option>
+
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label>Movement Type</label>
+
+    <select name="movement_type" class="form-select">
+      <option value="IN">IN</option>
+
+      <option value="OUT">OUT</option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label>Quantity</label>
+
+    <input type="number" min="1" name="quantity" class="form-control" />
+  </div>
+
+  <div class="mb-3">
+    <label>Description</label>
+
+    <textarea name="description" class="form-control"></textarea>
+  </div>
+
+  <button class="btn btn-success">Save</button>
+</form>
+
+{% endblock %}

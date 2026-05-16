@@ -4,13 +4,87 @@ from django.core.exceptions import ValidationError
 from django.db.models import Sum
 from django.utils import timezone
 from .models import (Customer,Deposit,CreditPurchase,Product,Sale,Supplier,Payment,Invoice,Notification,StockMovement)
+
+
+def index(request):
+
+    return render(
+        request,
+        'index.html'
+    )
 def dashboard(request):
-    products = Product.objects.count()
-    sales = Sale.objects.count()
-    return render(request, 'dashboard.html', {
-        'products': products,
-        'sales': sales
-    })
+    # COUNTS
+    total_products = Product.objects.count()
+    total_sales = Sale.objects.count()
+    total_customers = Customer.objects.count()
+    total_suppliers = Supplier.objects.count()
+    total_credit_purchases = CreditPurchase.objects.count()
+    total_deposits = Deposit.objects.count()
+
+    # TOTAL REVENUE
+
+    total_revenue = Sale.objects.aggregate(
+        Sum('total_amount')
+    )['total_amount__sum'] or 0
+
+    # TOTAL DEPOSITS AMOUNT
+
+    total_deposit_amount = Deposit.objects.aggregate(
+        Sum('amount')
+    )['amount__sum'] or 0
+
+    # TOTAL CREDIT BALANCE
+
+    total_credit_balance = CreditPurchase.objects.aggregate(
+        Sum('balance')
+    )['balance__sum'] or 0
+
+    # LOW STOCK PRODUCTS
+
+    low_stock_products = Product.objects.filter(
+        stock_quantity__lt=10
+    )
+
+    # RECENT SALES
+
+    recent_sales = Sale.objects.all().order_by('-date')[:5]
+
+    # RECENT SUPPLIERS
+
+    recent_suppliers = Supplier.objects.all().order_by('-date')[:5]
+
+    context = {
+
+        'total_products': total_products,
+
+        'total_sales': total_sales,
+
+        'total_customers': total_customers,
+
+        'total_suppliers': total_suppliers,
+
+        'total_credit_purchases': total_credit_purchases,
+
+        'total_deposits': total_deposits,
+
+        'total_revenue': total_revenue,
+
+        'total_deposit_amount': total_deposit_amount,
+
+        'total_credit_balance': total_credit_balance,
+
+        'low_stock_products': low_stock_products,
+
+        'recent_sales': recent_sales,
+
+        'recent_suppliers': recent_suppliers,
+    }
+
+    return render(
+        request,
+        'dashboard.html',
+        context
+    )
 
 def products(request):
     products = Product.objects.all()
@@ -60,57 +134,105 @@ def delete_product(request, id):
 
 # ADD SALE VIEW
 def add_sales(request):
-    # Fetching all products from the model class
-    products = Product.objects.all()
-    if request.method == 'POST': # Checking if form is submitted
-        # Geting form data
-        sales_representative = request.POST.get('sales_representative')
-        customer_name = request.POST.get('customer_name')
-        address = request.POST.get('address')
-        phone_number = request.POST.get('phone_number')
-        customer_type = request.POST.get('customer_type')
-        product_id = request.POST.get('product_name')
-        quantity = int(request.POST.get('quantity'))
-        selling_price = float(request.POST.get('selling_price'))
-        transport_fee = float(request.POST.get('transport_fee'))
-        # Geting selected product
-        product = Product.objects.get(id=product_id)
-        
-        # STOCK VALIDATION
-        # Replacing stock_quantity with the actual product stock field
-        if quantity > product.stock_quantity:
-            messages.error(request,"Not enough stock available")
-      
 
-            return redirect('add_sales')
-        
-        # CALCULATIng THE TOTAL
-        total_amount = (quantity * selling_price) + transport_fee
-       
-        # SAVING SALE
-    try:    
-        sale = Sale(
-            sales_representative=sales_representative,
-            customer_name=customer_name,
-            address=address,
-            phone_number=phone_number,
-            customer_type=customer_type,
-            product_name=product,
-            quantity=quantity,
-            selling_price=selling_price,
-            total_amount=total_amount,
-            transport_fee=transport_fee
-        )
-        sale.full_clean()
-        sale.save()
-    # reducig stock
-        product.stock_quantity -= quantity
-        product.save()
-        messages.success(request, "Sale added successfully")
-        return redirect('sales')
-    except ValidationError as e:
-        messages.error(request, e)
-        return redirect('add_sales')
+    products = Product.objects.all()
+
+    if request.method == 'POST':
+
+        try:
+
+            sales_representative = request.POST.get('sales_representative')
+
+            customer_name = request.POST.get('customer_name')
+
+            address = request.POST.get('address')
+
+            phone_number = request.POST.get('phone_number')
+
+            customer_type = request.POST.get('customer_type')
+
+            product_id = request.POST.get('product_name')
+
+            quantity = int(request.POST.get('quantity'))
+
+            selling_price = float(request.POST.get('selling_price'))
+
+            transport_fee = float(request.POST.get('transport_fee'))
+
+            # GET PRODUCT
+
+            product = Product.objects.get(id=product_id)
+
+            # STOCK VALIDATION
+
+            if quantity > product.stock_quantity:
+
+                messages.error(
+                    request,
+                    "Not enough stock available"
+                )
+
+                return redirect('add_sales')
+
+            # TOTAL
+
+            total_amount = (
+                quantity * selling_price
+            ) + transport_fee
+
+            # CREATE SALE
+
+            sale = Sale(
+
+                sales_representative=sales_representative,
+
+                customer_name=customer_name,
+
+                address=address,
+
+                phone_number=phone_number,
+
+                customer_type=customer_type,
+
+                product_name=product,
+
+                quantity=quantity,
+
+                selling_price=selling_price,
+
+                total_amount=total_amount,
+
+                transport_fee=transport_fee
+            )
+
+            sale.full_clean()
+
+            sale.save()
+
+            # REDUCE STOCK
+
+            product.stock_quantity -= quantity
+
+            product.save()
+
+            messages.success(
+                request,
+                "Sale added successfully"
+            )
+
+            return redirect('sales')
+
+        except Exception as e:
+
+            messages.error(request, e)
+
+    context = {'products': products}
+
+    return render(
+        request,
+        'add_sales.html',
+        context
+    )
 
 # SALES LIST VIEW
 def sales(request):
@@ -490,3 +612,93 @@ def add_stock_movement(request):
             messages.error(request, e)
     context = {'products': products}
     return render(request,'add_stock_movement.html',context)
+
+# INVOICES LIST
+def invoices(request):
+    invoices = Invoice.objects.all().order_by('-date')
+    context = {'invoices': invoices}
+    return render(request, 'invoices.html', context)
+# ADD INVOICE
+
+def add_invoice(request):
+    customers = Customer.objects.all()
+    if request.method == 'POST':
+        try:
+            customer_id = request.POST.get('customer')
+            customer = Customer.objects.get(id=customer_id)
+            invoice = Invoice(
+                customer=customer,
+                invoice_number=request.POST.get('invoice_number'),
+                total_amount=request.POST.get('total_amount')
+            )
+            invoice.full_clean()
+            invoice.save()
+            messages.success(request,"Invoice created successfully")
+            return redirect('invoices')
+        except ValidationError as e:
+            messages.error(request, e)
+    context = {'customers': customers}
+    return render(request, 'add_invoice.html', context)
+
+# NOTIFICATIONS
+def notifications(request):
+    notifications = Notification.objects.all().order_by('-date')
+    context = {'notifications': notifications}
+    return render(request,'notifications.html',context)
+# ADD NOTIFICATION
+
+def add_notification(request):
+    if request.method == 'POST':
+        try:
+            notification = Notification(
+                message=request.POST.get('message')
+            )
+            notification.full_clean()
+            notification.save()
+            messages.success(
+                request,
+                "Notification added successfully"
+            )
+            return redirect('notifications')
+        except ValidationError as e:
+            messages.error(request, e)
+    return render(request, 'add_notification.html')
+
+# PAYMENTS LIST
+
+def payments(request):
+
+    payments = Payment.objects.all().order_by('-payment_date')
+
+    context = {
+        'payments': payments
+    }
+
+    return render(
+        request,
+        'payments.html',
+        context
+    )
+
+
+# PAYMENT RECEIPT VIEW
+
+def payment_receipt(request, id):
+
+    # GET PAYMENT
+    payment = get_object_or_404(
+        Payment,
+        id=id
+    )
+
+    # SEND DATA TO TEMPLATE
+    context = {
+        'payment': payment
+    }
+
+    # RENDER TEMPLATE
+    return render(
+        request,
+        'payment_receipt.html',
+        context
+    )
