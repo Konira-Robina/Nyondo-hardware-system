@@ -56,6 +56,47 @@ class Sale(models.Model):
         if self.quantity > self.product_name.stock_quantity:raise ValidationError("Quantity cannot exceed available stock.")
     def __str__(self):
         return self.customer_name
+    # CART MODEL
+
+class Cart(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Cart {self.id}"
+
+
+# CART ITEM MODEL
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(
+        Cart,
+        on_delete=models.CASCADE,
+        related_name='items'
+    )
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE
+    )
+
+    quantity = models.IntegerField(
+        validators=[MinValueValidator(1)]
+    )
+
+    selling_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(0)]
+    )
+
+    subtotal = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        validators=[MinValueValidator(0)]
+    )
+
+    def __str__(self):
+        return self.product.name
 
 # DEPOSITS
 class Deposit(models.Model):
@@ -67,23 +108,23 @@ class Deposit(models.Model):
 
 # SUPPLIERS
 class Supplier(models.Model):
-    PAYMENT_METHODS = (
-        ('Cash', 'Cash'),
-        ('Mobile Money', 'Mobile Money'),
-        ('Bank', 'Bank'),
-    )
+    PAYMENT_STATUS = [
+        ('Pending', 'Pending'),
+        ('Partial', 'Partial'),
+        ('Paid', 'Paid'),
+    ]
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
-    supplier_name = models.CharField(max_length=100,validators=[MinLengthValidator(3)])
-    quantity = models.IntegerField(validators=[MinValueValidator(1)])
-    cost_price = models.DecimalField(max_digits=10,decimal_places=2,validators=[MinValueValidator(0)])
+    supplier_name = models.CharField(max_length=100)
+    quantity = models.IntegerField(validators=[MinValueValidator(0)])
+    cost_price = models.DecimalField(max_digits=10,decimal_places=2)
+    total_cost = models.DecimalField(max_digits=12,decimal_places=2,default=0)
+    amount_paid = models.DecimalField(max_digits=12,decimal_places=2,default=0)
+    balance = models.DecimalField(max_digits=12,decimal_places=2,default=0)
+    payment_status = models.CharField( max_length=20,choices=PAYMENT_STATUS,default='Pending')
     date = models.DateField()
-    method_of_payment = models.CharField(max_length=100,choices=PAYMENT_METHODS,default="Cash")
-    amount_paid = models.DecimalField(max_digits=10,decimal_places=2,validators=[MinValueValidator(0)])
-    def clean(self):
-        if self.amount_paid < 0:raise ValidationError("Amount paid cannot be negative.")
     def __str__(self):
         return self.supplier_name
-
+    
 # CREDIT PURCHASES
 class CreditPurchase(models.Model):
     PAYMENT_STATUS = (

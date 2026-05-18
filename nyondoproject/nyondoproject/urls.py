@@ -55,6 +55,11 @@ urlpatterns = [
     path('add_notification/', views.add_notification, name='add_notification'),
     path('login/',views.login_view,name='login'),
     path('logout/',views.logout_view,name='logout'),
+    path('cart/',views.cart,name='cart'),
+    path('add_to_cart/<int:product_id>/',views.add_to_cart,name='add_to_cart'),
+    path('remove_cart_item/<int:id>/',views.remove_cart_item,name='remove_cart_item'),
+    path('checkout/',views.checkout,name='checkout'),
+    path('reports/',views.reports,name='reports'),
     ]
 
 

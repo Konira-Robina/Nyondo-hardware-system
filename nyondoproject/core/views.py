@@ -6,8 +6,7 @@ from decimal import Decimal
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import (Customer,Deposit,CreditPurchase,Product,Sale,Supplier,Payment,Invoice,Notification,StockMovement)
-
+from .models import (Customer,Deposit,CreditPurchase,Product,Sale,Supplier,Payment,Invoice,Notification,StockMovement, Cart, CartItem)
 
 def index(request):
     return render(request,'index.html')
@@ -114,174 +113,10 @@ from django.core.exceptions import ValidationError
 def add_sales(request):
 
     # FETCH PRODUCTS
-
     products = Product.objects.all()
-
     if request.method == 'POST':
-
         try:
-
             # GET FORM DATA
-
-            sales_representative = request.POST.get(
-                'sales_representative'
-            )
-
-            customer_name = request.POST.get(
-                'customer_name'
-            )
-
-            address = request.POST.get(
-                'address'
-            )
-
-            phone_number = request.POST.get(
-                'phone_number'
-            )
-
-            customer_type = request.POST.get(
-                'customer_type'
-            )
-
-            product_id = request.POST.get(
-                'product_name'
-            )
-
-            quantity = int(
-                request.POST.get('quantity')
-            )
-
-            selling_price = Decimal(
-                request.POST.get('selling_price')
-            )
-
-            distance = Decimal(
-                request.POST.get('distance')
-            )
-
-            # GET PRODUCT
-
-            product = get_object_or_404(
-                Product,
-                id=product_id
-            )
-
-            # STOCK VALIDATION
-
-            if quantity > product.stock_quantity:
-
-                messages.error(
-                    request,
-                    "Not enough stock available"
-                )
-
-                return redirect('add_sales')
-
-            # CALCULATE GOODS TOTAL
-
-            goods_total = (
-                quantity * selling_price
-            )
-
-            # TRANSPORT RULE
-
-            if goods_total >= Decimal('500000') and distance <= Decimal('10'):
-
-                transport_fee = Decimal('0')
-
-            else:
-
-                transport_fee = Decimal('30000')
-
-            # FINAL TOTAL
-
-            total_amount = (
-                goods_total + transport_fee
-            )
-
-            # CREATE SALE
-
-            sale = Sale(
-
-                sales_representative=sales_representative,
-
-                customer_name=customer_name,
-
-                address=address,
-
-                phone_number=phone_number,
-
-                customer_type=customer_type,
-
-                product_name=product,
-
-                quantity=quantity,
-
-                selling_price=selling_price,
-
-                transport_fee=transport_fee,
-
-                total_amount=total_amount
-            )
-
-            # MODEL VALIDATION
-
-            sale.full_clean()
-
-            # SAVE SALE
-
-            sale.save()
-
-            # REDUCE STOCK
-
-            product.stock_quantity -= quantity
-
-            product.save()
-
-            messages.success(
-                request,
-                "Sale added successfully"
-            )
-
-            return redirect('sales')
-
-        except ValidationError as e:
-
-            messages.error(
-                request,
-                e
-            )
-
-        except ValueError:
-
-            messages.error(
-                request,
-                "Please enter valid numbers"
-            )
-
-        except Exception as e:
-
-            messages.error(
-                request,
-                f"Error: {e}"
-            )
-
-    # GET REQUEST
-
-    context = {
-        'products': products
-    }
-
-    return render(
-        request,
-        'add_sales.html',
-        context
-    )
-'''
-def add_sales(request):
-    products = Product.objects.all()
-    if request.method == 'POST':
-        try:
             sales_representative = request.POST.get('sales_representative')
             customer_name = request.POST.get('customer_name')
             address = request.POST.get('address')
@@ -289,20 +124,31 @@ def add_sales(request):
             customer_type = request.POST.get('customer_type')
             product_id = request.POST.get('product_name')
             quantity = int(request.POST.get('quantity'))
-            selling_price = float(request.POST.get('selling_price'))
-            transport_fee = float(request.POST.get('transport_fee'))
+            selling_price = Decimal(request.POST.get('selling_price'))
+            distance = Decimal(request.POST.get('distance'))
 
             # GET PRODUCT
-            product = Product.objects.get(id=product_id)
+            product = get_object_or_404(Product,id=product_id)
+
             # STOCK VALIDATION
             if quantity > product.stock_quantity:
                 messages.error(request,"Not enough stock available")
                 return redirect('add_sales')
-            # TOTAL
-            total_amount = (quantity * selling_price) + transport_fee
+
+            # CALCULATE GOODS TOTAL
+            goods_total = (quantity * selling_price)
+
+            # TRANSPORT RULE
+            if goods_total >= Decimal('500000') and distance <= Decimal('10'):
+                transport_fee = Decimal('0')
+            else:
+                transport_fee = Decimal('30000')
+
+            # FINAL TOTAL
+            total_amount = (goods_total + transport_fee)
+
             # CREATE SALE
-            sale = Sale(
-                sales_representative=sales_representative,
+            sale = Sale(sales_representative=sales_representative,
                 customer_name=customer_name,
                 address=address,
                 phone_number=phone_number,
@@ -310,21 +156,29 @@ def add_sales(request):
                 product_name=product,
                 quantity=quantity,
                 selling_price=selling_price,
-                total_amount=total_amount,
-                transport_fee=transport_fee
+                transport_fee=transport_fee,
+                total_amount=total_amount
             )
+            # MODEL VALIDATION
             sale.full_clean()
+            # SAVE SALE
             sale.save()
+
             # REDUCE STOCK
             product.stock_quantity -= quantity
             product.save()
             messages.success(request,"Sale added successfully")
             return redirect('sales')
-        except Exception as e:
+        except ValidationError as e:
             messages.error(request, e)
+        except ValueError:
+            messages.error(request,"Please enter valid numbers")
+        except Exception as e:
+            messages.error(request,f"Error: {e}")
+    # GET REQUEST
     context = {'products': products}
     return render(request,'add_sales.html',context)
-'''
+
 # SALES LIST VIEW
 def sales(request):
     # Fetch all sales
@@ -370,11 +224,9 @@ def edit_sale(request, id):
             return redirect('sales')
         except ValidationError as e:
             messages.error(request, e)
-    context = {
-        'sale': sale,
-        'products': products
-    }
+    context = {'sale': sale,'products': products}
     return render(request, 'edit_sales.html', context)
+
 #Deleting Sales
 def delete_sale(request, id):
     sale = get_object_or_404(Sale, id=id)
@@ -383,6 +235,104 @@ def delete_sale(request, id):
     product.save()
     sale.delete()
     messages.success(request, "Sale deleted successfully")
+    return redirect('sales')
+
+@login_required
+def cart(request):
+    cart_id = request.session.get('cart_id')
+    if cart_id:
+        cart = Cart.objects.get(id=cart_id)
+    else:
+        cart = Cart.objects.create()
+        request.session['cart_id'] = cart.id
+    items = cart.items.all()
+    total = sum(item.subtotal for item in items)
+    context = {
+        'cart': cart,
+        'items': items,
+        'total': total
+    }
+    return render(request, 'cart.html', context)
+
+# STEP 5 — ADD TO CART 
+@login_required
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product,id=product_id)
+    quantity = int(request.POST.get('quantity'))
+
+    # STOCK VALIDATION
+    if quantity > product.stock_quantity:
+        messages.error(request,'Not enough stock available')
+        return redirect('products')
+
+    # GET OR CREATE CART
+    cart_id = request.session.get('cart_id')
+    if cart_id:
+        cart = Cart.objects.get(id=cart_id)
+    else:
+        cart = Cart.objects.create()
+        request.session['cart_id'] = cart.id
+
+    # CHECK EXISTING ITEM
+    item = CartItem.objects.filter(cart=cart,product=product).first()
+    subtotal = Decimal(quantity) * product.selling_price
+    if item:
+        item.quantity += quantity
+        item.subtotal += subtotal
+        item.save()
+    else:
+        CartItem.objects.create(
+            cart=cart,
+            product=product,
+            quantity=quantity,
+            selling_price=product.selling_price,
+            subtotal=subtotal
+        )
+    messages.success(request,'Product added to cart')
+    return redirect('cart')
+
+# REMOVE ITEM FROM CART
+@login_required
+def remove_cart_item(request, id):
+    item = get_object_or_404(CartItem,id=id)
+    item.delete()
+    messages.success(request,'Item removed from cart')
+    return redirect('cart')
+
+@login_required
+def checkout(request):
+    cart_id = request.session.get('cart_id')
+    if not cart_id:
+        messages.error(request,'Cart is empty')
+        return redirect('cart')
+    cart = Cart.objects.get(id=cart_id)
+    items = cart.items.all()
+    if not items:
+        messages.error( request,'Cart is empty')
+        return redirect('cart')
+
+    for item in items:
+        product = item.product
+        # REDUCE STOCK
+        product.stock_quantity -= item.quantity
+        product.save()
+        # SAVE SALE RECORD
+        Sale.objects.create(
+            sales_representative=request.user.username,
+            customer_name='Walk In Customer',
+            address='N/A',
+            phone_number='N/A',
+            customer_type='Retail',
+            product_name=product,
+            quantity=item.quantity,
+            selling_price=item.selling_price,
+            transport_fee=0,
+            total_amount=item.subtotal
+        )
+    # CLEAR CART
+    cart.items.all().delete()
+    del request.session['cart_id']
+    messages.success(request,'Checkout completed successfully')
     return redirect('sales')
 
 # CUSTOMERS LIST
@@ -441,10 +391,17 @@ def add_supplier(request):
         date = request.POST.get('date')
         method_of_payment = request.POST.get('method_of_payment')
         amount_paid = float(request.POST.get('amount_paid'))
-
+        total_cost = quantity * cost_price
+        balance = total_cost - amount_paid
+        if balance <= 0:
+            payment_status = 'Paid'
+        elif amount_paid > 0:
+            payment_status = 'Partial'
+        else:
+            payment_status = 'Pending'
         # GET PRODUCT
-        product = Product.objects.get(id=product_id)
 
+        product = Product.objects.get(id=product_id)
         # SAVE SUPPLIER RECORD
         Supplier.objects.create(product=product,
             supplier_name=supplier_name,
@@ -790,6 +747,43 @@ def payment_receipt(request, id):
     # RENDER TEMPLATE
     return render(request,'payment_receipt.html',context)
 
+
+@login_required
+def reports(request):
+    # COUNTS
+    total_products = Product.objects.count()
+    total_sales_count = Sale.objects.count()
+    total_customers = Customer.objects.count()
+    total_suppliers = Supplier.objects.count()
+    # SALES TOTAL
+    total_sales = Sale.objects.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+    # PAYMENTS TOTAL
+    total_payments = Payment.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+    # CREDIT BALANCE
+    outstanding_credit = CreditPurchase.objects.aggregate(Sum('balance'))['balance__sum'] or 0
+    # LOW STOCK
+    low_stock_products = Product.objects.filter(stock_quantity__lt=10)
+    # RECENT DATA
+    recent_sales = Sale.objects.order_by('-date')[:5]
+    recent_payments = Payment.objects.order_by('-payment_date')[:5]
+    recent_suppliers = Supplier.objects.order_by('-date')[:5]
+    pending_credits = CreditPurchase.objects.filter( payment_status='Pending').order_by('-date')[:5]
+    context = {
+        'total_products': total_products,
+        'total_sales_count': total_sales_count,
+        'total_customers': total_customers,
+        'total_suppliers': total_suppliers,
+        'total_sales': total_sales,
+        'total_payments': total_payments,
+        'outstanding_credit': outstanding_credit,
+        'low_stock_products': low_stock_products,
+        'recent_sales': recent_sales,
+        'recent_payments': recent_payments,
+        'recent_suppliers': recent_suppliers,
+        'pending_credits': pending_credits,
+    }
+    return render(request,'reports.html',context) 
+
 # LOGIN VIEW
 def login_view(request):
     if request.method == 'POST':
@@ -797,7 +791,6 @@ def login_view(request):
         password = request.POST.get('password')
         # AUTHENTICATE USER
         user = authenticate(request,username=username,password=password)
-
         # CHECK USER
         if user is not None:
             login(request, user)
@@ -811,3 +804,4 @@ def logout_view(request):
     logout(request)
     messages.success(request,'Logged out successfully')
     return redirect('login')
+

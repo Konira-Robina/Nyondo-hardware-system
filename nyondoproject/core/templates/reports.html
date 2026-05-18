@@ -1,0 +1,171 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4 fw-bold">General Reports Dashboard</h2>
+
+    <!-- SUMMARY CARDS -->
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card shadow border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-money-bill-wave fa-2x text-success mb-2"></i>
+
+                    <h5>Total Sales</h5>
+
+                    <h3>UGX {{ total_sales }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card shadow border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-credit-card fa-2x text-danger mb-2"></i>
+
+                    <h5>Outstanding Credit</h5>
+
+                    <h3>UGX {{ outstanding_credit }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card shadow border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x text-primary mb-2"></i>
+
+                    <h5>Customers</h5>
+
+                    <h3>{{ total_customers }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card shadow border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-boxes fa-2x text-warning mb-2"></i>
+
+                    <h5>Products</h5>
+
+                    <h3>{{ total_products }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECENT SALES -->
+
+    <div class="card shadow mb-4">
+        <div class="card-header bg-dark text-white">Recent Sales</div>
+
+        <div class="card-body table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+
+                        <th>Product</th>
+
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for sale in recent_sales %}
+
+                    <tr>
+                        <td>{{ sale.customer_name }}</td>
+
+                        <td>{{ sale.product_name }}</td>
+
+                        <td>UGX {{ sale.total_amount }}</td>
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="3">No sales found</td>
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- LOW STOCK -->
+
+    <div class="card shadow mb-4">
+        <div class="card-header bg-danger text-white">Low Stock Products</div>
+
+        <div class="card-body table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for product in low_stock_products %}
+
+                    <tr>
+                        <td>{{ product.name }}</td>
+
+                        <td>{{ product.stock_quantity }}</td>
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="2">No low stock products</td>
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PENDING CREDITS -->
+
+    <div class="card shadow mb-4">
+        <div class="card-header bg-warning">Pending Credit Purchases</div>
+
+        <div class="card-body table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for credit in pending_credits %}
+
+                    <tr>
+                        <td>{{ credit.customer.full_name }}</td>
+
+                        <td>UGX {{ credit.balance }}</td>
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="2">No pending credits</td>
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
