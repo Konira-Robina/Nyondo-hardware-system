@@ -1,64 +1,126 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Nyondo System</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  </head>
 
-  <body>
+<head>
+  <title>Nyondo System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+  <div>
+    <!-- TOP NAVBAR -->
+    <div style="position: fixed; margin-left: 250px;width: 1000px;">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container-fluid">
+          <!-- BRAND -->
+
+          <!-- <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}" style="margin-left: 250px;">
+        NYONDO HARDWARE LIMITED
+      </a> -->
+
+          <!-- TOGGLER -->
+
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <!-- NAVBAR CONTENT -->
+
+          <div class="collapse navbar-collapse" id="navbarContent" style="margin-left: 50px;">
+            <!-- RIGHT SIDE -->
+            <a href="/" class="text-white text-decoration-none d-block mb-3">
+              Back to Home Page
+            </a>
+
+            <ul class="navbar-nav ms-auto align-items-center">
+              {% if user.is_authenticated %}
+
+              <!-- NOTIFICATIONS -->
+
+              <li class="nav-item me-3">
+                <a class="nav-link position-relative" href="{% url 'notifications' %}">
+                  <i class="fas fa-bell"></i>
+
+                  Notifications {% if unread_notifications_count > 0 %}
+
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ unread_notifications_count }}
+                  </span>
+
+                  {% endif %}
+                </a>
+              </li>
+
+              <!-- USER -->
+
+              <li class="nav-item me-3">
+                <span class="nav-link text-warning">
+                  Welcome, {{ request.user.username }}
+                </span>
+              </li>
+
+              <!-- LOGOUT -->
+
+              <li class="nav-item">
+                <a class="btn btn-danger btn-sm" href="{% url 'logout' %}">
+                  Logout
+                </a>
+              </li>
+
+              {% else %}
+
+              <!-- LOGIN -->
+
+              <li class="nav-item">
+                <a class="btn btn-primary btn-sm" href="{% url 'login' %}">
+                  Login
+                </a>
+              </li>
+
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
     <div class="d-flex">
       <div class="d-flex">
         <!-- SIDEBAR -->
 
-        <div
-          class="bg-dark text-white p-3 vh-100"
-          style="width: 260px; position: fixed"
-        >
-          <h4 class="mb-4 text-center">NYONDO HARDWARE</h4>
+        <div class="bg-dark text-white p-3 vh-100" style="width: 260px; position: fixed">
+          <h4 class="mb-4 text-center">NYONDO HARDWARE LIMITED</h4>
 
           <!-- DASHBOARD -->
+          <a class="nav-link" href="{% url 'dashboard' %}">
 
-          <a href="/" class="text-white text-decoration-none d-block mb-3">
-            🏠 Dashboard
+            Dashboard
+
           </a>
 
           <!-- PRODUCTS -->
 
           <h6 class="text-secondary mt-4">STOCK MANAGEMENT</h6>
 
-          <a
-            href="/products/"
-            class="text-white text-decoration-none d-block mb-2"
-          >
-            📦 Products
+          <a href="/products/" class="text-white text-decoration-none d-block mb-2">
+            <i class="fa-graphite fa-thin fa-box" style="color: rgb(116, 192, 252);"></i>Products
           </a>
 
-          <a
-            href="/suppliers/"
-            class="text-white text-decoration-none d-block mb-2"
-          >
-            🚚 Suppliers
+          <a href="/suppliers/" class="text-white text-decoration-none d-block mb-2">
+            Suppliers
           </a>
 
           <!-- SALES -->
 
           <h6 class="text-secondary mt-4">SALES</h6>
 
-          <a
-            href="/sales/"
-            class="text-white text-decoration-none d-block mb-2"
-          >
-            💰 Sales
+          <a href="/sales/" class="text-white text-decoration-none d-block mb-2">
+             Sales
           </a>
 
-          <a
-            href="/customers/"
-            class="text-white text-decoration-none d-block mb-2"
-          >
+          <a href="/customers/" class="text-white text-decoration-none d-block mb-2">
             👥 Customers
           </a>
 
@@ -66,44 +128,27 @@
 
           <h6 class="text-secondary mt-4">CREDIT SCHEME</h6>
 
-          <a
-            href="/credit_purchases/"
-            class="text-white text-decoration-none d-block mb-2"
-          >
-            🧾 Credit Purchases
+          <a href="/credit_purchases/" class="text-white text-decoration-none d-block mb-2">
+             Credit Purchases
           </a>
 
-          <a
-            href="/deposits/"
-            class="text-white text-decoration-none d-block mb-2"
-          >
-            💵 Deposits
+          <a href="/deposits/" class="text-white text-decoration-none d-block mb-2">
+             Deposits
           </a>
 
-          <a
-            href="/payments/"
-            class="text-white text-decoration-none d-block mb-2"
-          >
-            💳 Payments
+          <a href="/payments/" class="text-white text-decoration-none d-block mb-2">
+             Payments
           </a>
-
-          <!-- OTHER -->
-
           <h6 class="text-secondary mt-4">OTHER</h6>
+          <!-- INVOICES -->
 
-          <a
-            href="/invoices/"
-            class="text-white text-decoration-none d-block mb-2"
-          >
-            📄 Invoices
+
+          <a class="nav-link" href="{% url 'invoices' %}">
+            <i class="fas fa-file-invoice"></i>
+
+            Invoices
           </a>
 
-          <a
-            href="/notifications/"
-            class="text-white text-decoration-none d-block mb-2"
-          >
-            🔔 Notifications
-          </a>
         </div>
 
         <!-- MAIN CONTENT -->
@@ -111,16 +156,10 @@
         <div class="p-4" style="margin-left: 260px; width: 100%">
           {% if messages %} {% for message in messages %}
 
-          <div
-            class="alert alert-{{ message.tags }} alert-dismissible fade show"
-          >
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
             {{ message }}
 
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="alert"
-            ></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>
 
           {% endfor %} {% endif %}
@@ -137,5 +176,7 @@
     </div>
 
     {% endfor %} {% endif %}
-  </body>
+  </div>
+</body>
+
 </html>

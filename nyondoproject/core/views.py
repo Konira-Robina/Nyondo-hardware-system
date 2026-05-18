@@ -2,16 +2,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db.models import Sum
+from decimal import Decimal
 from django.utils import timezone
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from .models import (Customer,Deposit,CreditPurchase,Product,Sale,Supplier,Payment,Invoice,Notification,StockMovement)
 
 
 def index(request):
-
-    return render(
-        request,
-        'index.html'
-    )
+    return render(request,'index.html')
+@login_required
 def dashboard(request):
     # COUNTS
     total_products = Product.objects.count()
@@ -22,70 +22,40 @@ def dashboard(request):
     total_deposits = Deposit.objects.count()
 
     # TOTAL REVENUE
-
-    total_revenue = Sale.objects.aggregate(
-        Sum('total_amount')
-    )['total_amount__sum'] or 0
-
+    total_revenue = Sale.objects.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+    
     # TOTAL DEPOSITS AMOUNT
-
-    total_deposit_amount = Deposit.objects.aggregate(
-        Sum('amount')
-    )['amount__sum'] or 0
-
+    total_deposit_amount = Deposit.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    
     # TOTAL CREDIT BALANCE
-
-    total_credit_balance = CreditPurchase.objects.aggregate(
-        Sum('balance')
-    )['balance__sum'] or 0
+    total_credit_balance = CreditPurchase.objects.aggregate(Sum('balance'))['balance__sum'] or 0
 
     # LOW STOCK PRODUCTS
-
-    low_stock_products = Product.objects.filter(
-        stock_quantity__lt=10
-    )
+    low_stock_products = Product.objects.filter(stock_quantity__lt=10)
 
     # RECENT SALES
-
     recent_sales = Sale.objects.all().order_by('-date')[:5]
 
     # RECENT SUPPLIERS
-
     recent_suppliers = Supplier.objects.all().order_by('-date')[:5]
-
+    
     context = {
-
         'total_products': total_products,
-
         'total_sales': total_sales,
-
         'total_customers': total_customers,
-
         'total_suppliers': total_suppliers,
-
         'total_credit_purchases': total_credit_purchases,
-
         'total_deposits': total_deposits,
-
         'total_revenue': total_revenue,
-
         'total_deposit_amount': total_deposit_amount,
-
         'total_credit_balance': total_credit_balance,
-
         'low_stock_products': low_stock_products,
-
         'recent_sales': recent_sales,
-
         'recent_suppliers': recent_suppliers,
     }
+    return render(request,'dashboard.html',context)
 
-    return render(
-        request,
-        'dashboard.html',
-        context
-    )
-
+@login_required
 def products(request):
     products = Product.objects.all()
     return render(request, 'products.html', {'products': products})
@@ -128,12 +98,22 @@ def edit_product(request, id):
 
 def delete_product(request, id):
     product = get_object_or_404(Product, id=id)
+    product.save()
     product.delete()
+    messages.success(request, "Product deleted successfully")
     return redirect('products')
 # SALES INFORMATION
 
 # ADD SALE VIEW
+from decimal import Decimal
+from django.core.exceptions import ValidationError
+
+# ADD SALES
+
+@login_required
 def add_sales(request):
+
+    # FETCH PRODUCTS
 
     products = Product.objects.all()
 
@@ -141,27 +121,50 @@ def add_sales(request):
 
         try:
 
-            sales_representative = request.POST.get('sales_representative')
+            # GET FORM DATA
 
-            customer_name = request.POST.get('customer_name')
+            sales_representative = request.POST.get(
+                'sales_representative'
+            )
 
-            address = request.POST.get('address')
+            customer_name = request.POST.get(
+                'customer_name'
+            )
 
-            phone_number = request.POST.get('phone_number')
+            address = request.POST.get(
+                'address'
+            )
 
-            customer_type = request.POST.get('customer_type')
+            phone_number = request.POST.get(
+                'phone_number'
+            )
 
-            product_id = request.POST.get('product_name')
+            customer_type = request.POST.get(
+                'customer_type'
+            )
 
-            quantity = int(request.POST.get('quantity'))
+            product_id = request.POST.get(
+                'product_name'
+            )
 
-            selling_price = float(request.POST.get('selling_price'))
+            quantity = int(
+                request.POST.get('quantity')
+            )
 
-            transport_fee = float(request.POST.get('transport_fee'))
+            selling_price = Decimal(
+                request.POST.get('selling_price')
+            )
+
+            distance = Decimal(
+                request.POST.get('distance')
+            )
 
             # GET PRODUCT
 
-            product = Product.objects.get(id=product_id)
+            product = get_object_or_404(
+                Product,
+                id=product_id
+            )
 
             # STOCK VALIDATION
 
@@ -174,11 +177,27 @@ def add_sales(request):
 
                 return redirect('add_sales')
 
-            # TOTAL
+            # CALCULATE GOODS TOTAL
+
+            goods_total = (
+                quantity * selling_price
+            )
+
+            # TRANSPORT RULE
+
+            if goods_total >= Decimal('500000') and distance <= Decimal('10'):
+
+                transport_fee = Decimal('0')
+
+            else:
+
+                transport_fee = Decimal('30000')
+
+            # FINAL TOTAL
 
             total_amount = (
-                quantity * selling_price
-            ) + transport_fee
+                goods_total + transport_fee
+            )
 
             # CREATE SALE
 
@@ -200,12 +219,16 @@ def add_sales(request):
 
                 selling_price=selling_price,
 
-                total_amount=total_amount,
+                transport_fee=transport_fee,
 
-                transport_fee=transport_fee
+                total_amount=total_amount
             )
 
+            # MODEL VALIDATION
+
             sale.full_clean()
+
+            # SAVE SALE
 
             sale.save()
 
@@ -222,18 +245,86 @@ def add_sales(request):
 
             return redirect('sales')
 
+        except ValidationError as e:
+
+            messages.error(
+                request,
+                e
+            )
+
+        except ValueError:
+
+            messages.error(
+                request,
+                "Please enter valid numbers"
+            )
+
         except Exception as e:
 
-            messages.error(request, e)
+            messages.error(
+                request,
+                f"Error: {e}"
+            )
 
-    context = {'products': products}
+    # GET REQUEST
+
+    context = {
+        'products': products
+    }
 
     return render(
         request,
         'add_sales.html',
         context
     )
+'''
+def add_sales(request):
+    products = Product.objects.all()
+    if request.method == 'POST':
+        try:
+            sales_representative = request.POST.get('sales_representative')
+            customer_name = request.POST.get('customer_name')
+            address = request.POST.get('address')
+            phone_number = request.POST.get('phone_number')
+            customer_type = request.POST.get('customer_type')
+            product_id = request.POST.get('product_name')
+            quantity = int(request.POST.get('quantity'))
+            selling_price = float(request.POST.get('selling_price'))
+            transport_fee = float(request.POST.get('transport_fee'))
 
+            # GET PRODUCT
+            product = Product.objects.get(id=product_id)
+            # STOCK VALIDATION
+            if quantity > product.stock_quantity:
+                messages.error(request,"Not enough stock available")
+                return redirect('add_sales')
+            # TOTAL
+            total_amount = (quantity * selling_price) + transport_fee
+            # CREATE SALE
+            sale = Sale(
+                sales_representative=sales_representative,
+                customer_name=customer_name,
+                address=address,
+                phone_number=phone_number,
+                customer_type=customer_type,
+                product_name=product,
+                quantity=quantity,
+                selling_price=selling_price,
+                total_amount=total_amount,
+                transport_fee=transport_fee
+            )
+            sale.full_clean()
+            sale.save()
+            # REDUCE STOCK
+            product.stock_quantity -= quantity
+            product.save()
+            messages.success(request,"Sale added successfully")
+            return redirect('sales')
+        except Exception as e:
+            messages.error(request, e)
+    context = {'products': products}
+    return render(request,'add_sales.html',context)
+'''
 # SALES LIST VIEW
 def sales(request):
     # Fetch all sales
@@ -242,7 +333,6 @@ def sales(request):
     return render( request,'sales.html',context)
 
 # EDIT SALE
-
 def edit_sale(request, id):
     sale = get_object_or_404(Sale, id=id)
     products = Product.objects.all()
@@ -296,7 +386,6 @@ def delete_sale(request, id):
     return redirect('sales')
 
 # CUSTOMERS LIST
-
 def customers(request):
     customers = Customer.objects.all().order_by('-id')
     context = {'customers': customers}
@@ -319,7 +408,6 @@ def add_customer(request):
     return render(request, 'add_customer.html')
 
 # EDIT CUSTOMER
-
 def edit_customer(request, id):
     customer = get_object_or_404(Customer,id=id)
     if request.method == 'POST':
@@ -327,7 +415,6 @@ def edit_customer(request, id):
         customer.nin = request.POST.get('nin')
         customer.phone = request.POST.get('phone')
         customer.save()
-
         messages.success(request,"Customer updated successfully")
         return redirect('customers')
     context = {'customer': customer}
@@ -335,7 +422,6 @@ def edit_customer(request, id):
         request,'edit_customer.html',context)
 
 # DELETE CUSTOMER
-
 def delete_customer(request, id):
     customer = get_object_or_404(Customer,id=id)
     customer.delete()
@@ -343,12 +429,9 @@ def delete_customer(request, id):
     return redirect('customers')
    
 # ADD SUPPLIER
-
 def add_supplier(request):
-
     # FETCH ALL PRODUCTS
     products = Product.objects.all()
-
     if request.method == 'POST':
         # GET FORM DATA
         product_id = request.POST.get('product')
@@ -381,7 +464,7 @@ def add_supplier(request):
     return render(request,'add_supplier.html',context)
 
 # SUPPLIER LIST
-
+@login_required
 def suppliers(request):
     suppliers = Supplier.objects.all().order_by('-date')
     context = {'suppliers': suppliers}
@@ -418,11 +501,9 @@ def edit_supplier(request, id):
         messages.success(request,"Supplier updated successfully")
         return redirect('suppliers')
     context = {'supplier': supplier,'products': products}
-
     return render(request,'edit_supplier.html',context)
 
 # DELETE SUPPLIER
-
 def delete_supplier(request, id):
     supplier = get_object_or_404(Supplier,id=id)
     # REDUCE STOCK AGAIN
@@ -435,6 +516,7 @@ def delete_supplier(request, id):
     return redirect('suppliers')
 
 # DEPOSIT LIST
+@login_required
 def deposits(request):
     deposits = Deposit.objects.all().order_by('-date')
     context = {'deposits': deposits}
@@ -474,7 +556,6 @@ def edit_deposit(request, id):
         'deposit': deposit,
         'customers': customers
     }
-
     return render(request, 'edit_deposit.html', context)
 # DELETE DEPOSIT
 def delete_deposit(request, id):
@@ -484,13 +565,14 @@ def delete_deposit(request, id):
     return redirect('deposits')
 
 # CREDIT PURCHASES LIST
-
+@login_required
 def credit_purchases(request):
     credits = CreditPurchase.objects.all().order_by('-date')
     context = {'credits': credits}
     return render(request,'credit_purchases.html',context)
 
 # ADD CREDIT PURCHASE
+@login_required
 def add_credit_purchase(request):
     customers = Customer.objects.all()
     products = Product.objects.all()
@@ -500,7 +582,7 @@ def add_credit_purchase(request):
         quantity = int(request.POST.get('quantity'))
         price_per_item = float(request.POST.get('price_per_item'))
         amount_paid = float(request.POST.get('amount_paid'))
-        
+
         # GET OBJECTS
         customer = Customer.objects.get(id=customer_id)
         product = Product.objects.get(id=product_id)
@@ -513,46 +595,66 @@ def add_credit_purchase(request):
         # CALCULATIONS
         total_amount = quantity * price_per_item
         balance = total_amount - amount_paid
+
         # PAYMENT STATUS
         if balance <= 0:
             payment_status = 'Paid'
         else:
-            payment_status = 'Pending'   
+            payment_status = 'Pending'
 
-                
+        # SAVE CREDIT PURCHASE
+        CreditPurchase.objects.create(
+            customer=customer,
+            product=product,
+            quantity=quantity,
+            price_per_item=price_per_item,
+            total_amount=total_amount,
+            amount_paid=amount_paid,
+            balance=balance,
+            payment_status=payment_status
+        )
 
-        # SAVE CREDIT
-        try:
-            credit = CreditPurchase(
-                customer=customer,
-                product=product,
-                quantity=quantity,
-                price_per_item=price_per_item,
-                total_amount=total_amount,
-                amount_paid=amount_paid,
-                balance=balance,
-                payment_status=payment_status
-            )
-            credit.full_clean()
-            credit.save()
-            product.stock_quantity -= quantity
-            product.save()
-            messages.success(request,'Credit purchase added successfully')
-            return redirect('credit_purchases')
-        except ValidationError as e:
-            messages.error(request, e)
+        # REDUCE STOCK
+        product.stock_quantity -= quantity
+        product.save()
+        messages.success(request,'Credit purchase added successfully')
+        return redirect('credit_purchases')
 
+    # GET REQUEST
+    context = {
+        'customers': customers,
+        'products': products
+    }
+    return render(request,'add_credit_purchase.html',context)
 # ADD PAYMENT
+
+@login_required
 def add_payment(request):
-    credits = CreditPurchase.objects.all()
+    # SHOW ONLY PENDING CREDIT PURCHASES
+    credits = CreditPurchase.objects.filter(payment_status='Pending')
+
     if request.method == 'POST':
         try:
-            credit = CreditPurchase.objects.get(id=request.POST.get('credit_purchase'))
-            amount_paid = float(request.POST.get('amount_paid'))
-            if amount_paid > credit.balance:
-                messages.error(request,"Payment exceeds balance")
+            # GET CREDIT PURCHASE
+            credit = get_object_or_404(CreditPurchase,id=request.POST.get('credit_purchase'))
+
+            # GET AMOUNT
+            amount_paid = Decimal(request.POST.get('amount_paid'))
+          
+            # VALIDATION
+            if amount_paid <= 0:
+                messages.error(request,"Amount must be greater than zero")
                 return redirect('add_payment')
+
+            # PREVENT OVERPAYMENT
+            if amount_paid > credit.balance:
+                messages.error(request,"Payment exceeds customer balance")
+                return redirect('add_payment')
+
+            # CALCULATE NEW BALANCE
             balance_after_payment = (credit.balance - amount_paid)
+
+            # SAVE PAYMENT
             payment = Payment(
                 credit_purchase=credit,
                 amount_paid=amount_paid,
@@ -560,19 +662,24 @@ def add_payment(request):
             )
             payment.full_clean()
             payment.save()
-            # UPDATE CREDIT
+
+            # UPDATE CREDIT PURCHASE
             credit.amount_paid += amount_paid
             credit.balance = balance_after_payment
+
+            # UPDATE STATUS
             if credit.balance <= 0:
                 credit.payment_status = 'Paid'
+            else:
+                credit.payment_status = 'Pending'
             credit.save()
-            messages.success(request,"Payment added successfully")
+            messages.success(request,"Payment recorded successfully")
             return redirect('payments')
-        except ValidationError as e:
-            messages.error(request, e)
+        except ValidationError as e:messages.error(request,e)
+        except Exception as e:
+            messages.error(request,f"Error: {e}")
     context = {'credits': credits}
-    return render(request, 'add_payment.html', context)
-
+    return render( request,'add_payment.html',context)
 # STOCK MOVEMENTS LIST
 
 def stock_movements(request):
@@ -614,6 +721,7 @@ def add_stock_movement(request):
     return render(request,'add_stock_movement.html',context)
 
 # INVOICES LIST
+@login_required
 def invoices(request):
     invoices = Invoice.objects.all().order_by('-date')
     context = {'invoices': invoices}
@@ -667,38 +775,39 @@ def add_notification(request):
 # PAYMENTS LIST
 
 def payments(request):
-
     payments = Payment.objects.all().order_by('-payment_date')
-
-    context = {
-        'payments': payments
-    }
-
-    return render(
-        request,
-        'payments.html',
-        context
-    )
-
+    context = {'payments': payments}
+    return render(request,'payments.html',context)
 
 # PAYMENT RECEIPT VIEW
 
+@login_required
 def payment_receipt(request, id):
-
     # GET PAYMENT
-    payment = get_object_or_404(
-        Payment,
-        id=id
-    )
-
+    payment = get_object_or_404(Payment,id=id)
     # SEND DATA TO TEMPLATE
-    context = {
-        'payment': payment
-    }
-
+    context = {'payment': payment}
     # RENDER TEMPLATE
-    return render(
-        request,
-        'payment_receipt.html',
-        context
-    )
+    return render(request,'payment_receipt.html',context)
+
+# LOGIN VIEW
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        # AUTHENTICATE USER
+        user = authenticate(request,username=username,password=password)
+
+        # CHECK USER
+        if user is not None:
+            login(request, user)
+            messages.success(request,'Login successful')
+            return redirect('dashboard')
+        else:
+            messages.error(request,'Invalid username or password')
+    return render(request,'login.html')
+# LOGOUT VIEW
+def logout_view(request):
+    logout(request)
+    messages.success(request,'Logged out successfully')
+    return redirect('login')

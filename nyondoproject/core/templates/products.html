@@ -1,35 +1,38 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
 
-{% block content %}
-<h3>Products</h3>
-<a href="/add_product/" class="btn btn-success">Add Product</a>
+<div class="container mt-5">
 
+    <!-- <div class="container mt-5"> -->
+    <div class="d-flex justify-content-between mb-2">
+        <h2>Stock Records</h2>
+        <a href="/add_product/" class="btn btn-success">+ Add Product</a>
+    </div>
+    <table class="table">
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Cost</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Action</th>
+        </tr>
 
-<table class="table">
-    <tr>
-        <th>Name</th>
-        <th>Category</th>
-        <th>Cost</th>
-        <th>Price</th>
-        <th>Stock</th>
-        <th>Action</th>
-    </tr>
+        {% for product in products %}
+        <tr>
+            <td>{{ product.name }}</td>
+            <td>{{ product.category }}</td>
+            <td>{{ product.unit_cost }}</td>
+            <td>{{ product.selling_price }}</td>
+            <td>{{ product.stock_quantity }}</td>
+            <td>
+                <a href="{% url 'edit_product' product.id %}" class="btn btn-success">Edit</a>
 
-    {% for product in products %}
-    <tr>
-        <td>{{ product.name }}</td>
-        <td>{{ product.category }}</td>
-        <td>{{ product.unit_cost }}</td>
-        <td>{{ product.selling_price }}</td>
-        <td>{{ product.stock_quantity }}</td>
-        <td>
-            <a href="{% url 'edit_product' product.id %}"class="btn btn-success">Edit</a>
-            <!-- <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
-                data-url="{% url 'delete_product' product.id %}" onclick="setDeleteUrl(this)">Delete</button> -->
-       <a href="{% url 'delete_product' product.id %}" class="btn btn-danger">Delete</a>
+                <a href="{% url 'delete_product' product.id %}" class="btn btn-danger"
+                    onclick="return confirm('Delete this Product?');">Delete</a>
             </td>
-    </tr>
-    {% endfor %}
-</table>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 
 {% endblock %}

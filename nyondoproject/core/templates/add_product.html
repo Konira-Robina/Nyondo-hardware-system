@@ -1,6 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<div class="container mt-5">
+  <div class="card shadow-lg border-0 rounded-4">
+    <!-- CARD HEADER -->
+
+    <div class="card-header bg-success text-white">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3>Add Product</h3>
+
+        <a href="{% url 'products' %}" class="btn btn-light"> View Stock </a>
+      </div>
+    </div>
+    </div>
+
 <form method="POST" action="{% url 'add_product' %}">
     {% csrf_token %}
 
@@ -26,6 +39,13 @@
         <label for="exampleInputPassword1" class="form-label">Quantity</label>
         <input type="number" name="stock_quantity" class="form-control" id="exampleInputPassword1">
     </div>
-    <button type="submit" class="btn btn-primary">Save</button>
+     <div class="d-flex justify-content-end gap-2">
+          <button type="reset" class="btn btn-secondary">Reset</button>
+
+          <button type="submit" class="btn btn-success px-5">Save Product</button>
+        </div>
+    <!-- <button type="submit" class="btn btn-primary">Save</button> -->
 </form>
+
+</div>
 {% endblock %}

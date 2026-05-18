@@ -53,6 +53,8 @@ urlpatterns = [
     path('payment_receipt/<int:id>/',views.payment_receipt,name='payment_receipt'),
     path('notifications/', views.notifications, name='notifications'),
     path('add_notification/', views.add_notification, name='add_notification'),
+    path('login/',views.login_view,name='login'),
+    path('logout/',views.logout_view,name='logout'),
     ]
 
 

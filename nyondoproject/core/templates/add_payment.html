@@ -17,18 +17,29 @@
             <div class="mb-3">
               <label class="form-label"> Credit Purchase </label>
 
-              <select name="credit_purchase" class="form-select" required>
-                <option value="">Select Credit Purchase</option>
+              <select name="credit_purchase"
+        class="form-select"
+        required>
 
-                {% for credit in credit_purchases %}
+    <option value="">
+        Select Credit Purchase
+    </option>
 
-                <option value="{{ credit.id }}">
-                  {{ credit.customer.full_name }} - {{ credit.product.name }} -
-                  Balance: UGX {{ credit.balance }}
-                </option>
+    {% for credit in credits %}
 
-                {% endfor %}
-              </select>
+    <option value="{{ credit.id }}">
+
+        {{ credit.customer.full_name }}
+        -
+        {{ credit.product.name }}
+        -
+        Balance: {{ credit.balance }}
+
+    </option>
+
+    {% endfor %}
+
+</select>
             </div>
 
             <!-- AMOUNT -->
